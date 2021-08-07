@@ -37,7 +37,19 @@ const typeDefs = gql`
     REVIEWED_ON_DESC
   }
 
-  type Author {
+  enum SearchOrderBy {
+    RESULT_ASC
+    RESULT_DESC
+  }
+
+  interface Person {
+    id: ID!
+    name: String!
+  }
+
+  union BookResult = Book | Author
+
+  type Author implements Person {
     id: ID!
     books: [Book]
     name: String!
@@ -61,7 +73,7 @@ const typeDefs = gql`
     reviewer: User!
     text: String
   }
-  type User {
+  type User implements Person {
     id: ID!
     email: String!
     library(limit: Int = 20, orderBy: LibraryOrderBy, page: Int): Books
@@ -99,6 +111,17 @@ const typeDefs = gql`
     book(id: ID!): Book
     books(limit: Int = 20, orderBy: BookOrderBy, page: Int): Books
     review(id: ID!): Review
+    searchPeople(
+      exact: Boolean = false
+      orderBy: SearchOrderBy
+      query: String!
+    ): [Person]
+
+    searchBooks(
+      exact: Boolean = false
+      orderBy: SearchOrderBy
+      query: String!
+    ): [BookResult]
     user(username: String!): User!
   }
 

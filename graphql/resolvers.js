@@ -52,6 +52,27 @@ const resolvers = {
       return dataSources.jsonServerApi.getUserReviews(user.id, args)
     },
   },
+
+  Person: {
+    __resolveType(obj, context, info) {
+      if (obj.username) {
+        return "User"
+      } else {
+        return "Author"
+      }
+    },
+  },
+
+  BookResult: {
+    __resolveType(obj, context, info) {
+      if (obj.title) {
+        return "Book"
+      } else {
+        return "Author"
+      }
+    },
+  },
+
   Query: {
     author(root, { id }, { dataSources }, info) {
       return dataSources.jsonServerApi.getAuthorById(id)
@@ -72,6 +93,14 @@ const resolvers = {
 
     user(root, { username }, { dataSources }, info) {
       return dataSources.jsonServerApi.getUser(username)
+    },
+
+    searchPeople(root, args, { dataSources }, info) {
+      return dataSources.jsonServerApi.searchPeople(args)
+    },
+
+    searchBooks(root, args, { dataSources }, info) {
+      return dataSources.jsonServerApi.searchBooks(args)
     },
   },
 
