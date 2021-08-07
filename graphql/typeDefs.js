@@ -1,5 +1,15 @@
 import { gql } from "apollo-server"
 const typeDefs = gql`
+  """
+  An ISO 8601-encoded UTC date string.
+  """
+  scalar DateTime
+
+  """
+  An integer-based rating from 1 (low) to 5 (high).
+  """
+  scalar Rating
+
   enum Genre {
     ADVENTURE
     CHILDREN
@@ -68,8 +78,8 @@ const typeDefs = gql`
   type Review {
     id: ID!
     book: Book
-    rating: Int!
-    reviewedOn: String!
+    rating: Rating!
+    reviewedOn: DateTime!
     reviewer: User!
     text: String
   }
@@ -145,14 +155,14 @@ const typeDefs = gql`
 
   input CreateReviewInput {
     bookId: ID!
-    rating: Int!
+    rating: Rating!
     reviewerId: ID!
     text: String
   }
 
   input UpdateReviewInput {
     id: ID!
-    rating: Int!
+    rating: Rating!
     text: String
   }
 
