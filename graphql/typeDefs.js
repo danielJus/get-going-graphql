@@ -1,4 +1,4 @@
-import { gql } from "apollo-server"
+import { gql } from "apollo-server";
 const typeDefs = gql`
   directive @unique(
     "The resource path name from the REST endpoint."
@@ -131,17 +131,9 @@ const typeDefs = gql`
     book(id: ID!): Book
     books(limit: Int = 20, orderBy: BookOrderBy, page: Int): Books
     review(id: ID!): Review
-    searchPeople(
-      exact: Boolean = false
-      orderBy: SearchOrderBy
-      query: String!
-    ): [Person]
+    searchPeople(exact: Boolean = false, orderBy: SearchOrderBy, query: String!): [Person]
 
-    searchBooks(
-      exact: Boolean = false
-      orderBy: SearchOrderBy
-      query: String!
-    ): [BookResult]
+    searchBooks(exact: Boolean = false, orderBy: SearchOrderBy, query: String!): [BookResult]
     user(username: String!): User!
   }
 
@@ -186,5 +178,5 @@ const typeDefs = gql`
     bookIds: [ID!]!
     userId: ID!
   }
-`
-export default typeDefs
+`;
+export default typeDefs;

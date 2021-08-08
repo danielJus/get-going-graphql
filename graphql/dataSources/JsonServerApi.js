@@ -1,52 +1,52 @@
-import { ForbiddenError, UserInputError } from "apollo-server"
-import { RESTDataSource } from "apollo-datasource-rest"
-import parseLinkHeader from "parse-link-header"
+import { ForbiddenError, UserInputError } from "apollo-server";
+import { RESTDataSource } from "apollo-datasource-rest";
+import parseLinkHeader from "parse-link-header";
 
 class JsonServerApi extends RESTDataSource {
-  baseURL = process.env.REST_API_BASE_URL
+  baseURL = process.env.REST_API_BASE_URL;
 
   async didReceiveResponse(response) {
     if (response.ok) {
-      this.linkHeader = response.headers.get("Link")
-      this.totalCountHeader = response.headers.get("X-Total-Count")
-      return this.parseBody(response)
+      this.linkHeader = response.headers.get("Link");
+      this.totalCountHeader = response.headers.get("X-Total-Count");
+      return this.parseBody(response);
     } else {
-      throw await this.errorFromResponse(response)
+      throw await this.errorFromResponse(response);
     }
   }
 
   parseParams({ limit, orderBy, page, ...rest }) {
     if (limit && limit > 100) {
-      throw new UserInputError("Maximum of 100 results per page")
+      throw new UserInputError("Maximum of 100 results per page");
     }
 
-    const paginationParams = []
-    paginationParams.push(`_limit=${limit}`, `_page=${page || "1"}`)
+    const paginationParams = [];
+    paginationParams.push(`_limit=${limit}`, `_page=${page || "1"}`);
     // Parse the `orderBy` argument into a `_sort` argument
     // Handle other parameters collected in `rest`
     // Return the full-assembled query string
 
-    const [sort, order] = orderBy ? orderBy.split("_") : []
+    const [sort, order] = orderBy ? orderBy.split("_") : [];
     // Handle other parameters collected in `rest`
     // Return the full-assembled query string
 
-    const otherParams = Object.keys(rest).map((key) => `${key}=${rest[key]}`)
+    const otherParams = Object.keys(rest).map((key) => `${key}=${rest[key]}`);
     const queryString = [
       ...(sort ? [`_sort=${sort}`] : []),
       ...(order ? [`_order=${order}`] : []),
       ...paginationParams,
       ...otherParams,
-    ].join("&")
-    return queryString ? `?${queryString}` : ""
+    ].join("&");
+    return queryString ? `?${queryString}` : "";
   }
 
   parsePageInfo({ limit, page }) {
     if (this.totalCountHeader) {
-      let hasNextPage, hasPrevPage
+      let hasNextPage, hasPrevPage;
       if (this.linkHeader) {
-        const { next, prev } = parseLinkHeader(this.linkHeader)
-        hasNextPage = !!next
-        hasPrevPage = !!prev
+        const { next, prev } = parseLinkHeader(this.linkHeader);
+        hasNextPage = !!next;
+        hasPrevPage = !!prev;
       }
       return {
         hasNextPage: hasNextPage || false,
@@ -54,20 +54,18 @@ class JsonServerApi extends RESTDataSource {
         page: page || 1,
         perPage: limit,
         totalCount: this.totalCountHeader,
-      }
+      };
     }
-    return null
+    return null;
   }
 
   getAuthorById(id) {
-    return this.get(`/authors/${id}`).catch(
-      (err) => err.message === "404: Not Found" && null
-    )
+    return this.get(`/authors/${id}`).catch((err) => err.message === "404: Not Found" && null);
   }
 
   async getAuthorBooks(authorId) {
-    const items = await this.get(`/authors/${authorId}/books`)
-    return items.map((item) => item.book)
+    const items = await this.get(`/authors/${authorId}/books`);
+    return items.map((item) => item.book);
   }
 
   async getAuthors({ limit, page, orderBy = "name_asc" }) {
@@ -75,21 +73,19 @@ class JsonServerApi extends RESTDataSource {
       ...(limit && { limit }),
       ...(page && { page }),
       orderBy,
-    })
-    const authors = await this.get(`/authors${queryString}`)
-    const pageInfo = this.parsePageInfo({ limit, page })
-    return { results: authors, pageInfo }
+    });
+    const authors = await this.get(`/authors${queryString}`);
+    const pageInfo = this.parsePageInfo({ limit, page });
+    return { results: authors, pageInfo };
   }
 
   getBookById(id) {
-    return this.get(`/books/${id}`).catch(
-      (err) => err.message === "404: Not Found" && null
-    )
+    return this.get(`/books/${id}`).catch((err) => err.message === "404: Not Found" && null);
   }
 
   async getBookAuthors(bookId) {
-    const items = await this.get(`/books/${bookId}/authors`)
-    return items.map((item) => item.author)
+    const items = await this.get(`/books/${bookId}/authors`);
+    return items.map((item) => item.author);
   }
 
   async getBooks({ limit, page, orderBy = "title_asc" }) {
@@ -97,10 +93,10 @@ class JsonServerApi extends RESTDataSource {
       ...(limit && { limit }),
       ...(page && { page }),
       orderBy,
-    })
-    const books = await this.get(`/books${queryString}`)
-    const pageInfo = this.parsePageInfo({ limit, page })
-    return { results: books, pageInfo }
+    });
+    const books = await this.get(`/books${queryString}`);
+    const pageInfo = this.parsePageInfo({ limit, page });
+    return { results: books, pageInfo };
   }
 
   async getBookReviews(bookId, { limit, page, orderBy = "createdAt_desc" }) {
@@ -109,22 +105,18 @@ class JsonServerApi extends RESTDataSource {
       ...(page && { page }),
       bookId,
       orderBy,
-    })
-    const reviews = await this.get(`/reviews${queryString}`)
-    const pageInfo = this.parsePageInfo({ limit, page })
-    return { results: reviews, pageInfo }
+    });
+    const reviews = await this.get(`/reviews${queryString}`);
+    const pageInfo = this.parsePageInfo({ limit, page });
+    return { results: reviews, pageInfo };
   }
 
   getReviewById(id) {
-    return this.get(`/reviews/${id}`).catch(
-      (err) => err.message === "404: Not Found" && null
-    )
+    return this.get(`/reviews/${id}`).catch((err) => err.message === "404: Not Found" && null);
   }
 
   getUserById(id) {
-    return this.get(`/users/${id}`).catch(
-      (err) => err.message === "404: Not Found" && null
-    )
+    return this.get(`/users/${id}`).catch((err) => err.message === "404: Not Found" && null);
   }
 
   async getUserLibrary(userId, { limit, page, orderBy = "createdAt_desc" }) {
@@ -134,11 +126,11 @@ class JsonServerApi extends RESTDataSource {
       ...(page && { page }),
       orderBy,
       userId,
-    })
-    const items = await this.get(`/userBooks${queryString}`)
-    const books = items.map((item) => item.book)
-    const pageInfo = this.parsePageInfo({ limit, page })
-    return { results: books, pageInfo }
+    });
+    const items = await this.get(`/userBooks${queryString}`);
+    const books = items.map((item) => item.book);
+    const pageInfo = this.parsePageInfo({ limit, page });
+    return { results: books, pageInfo };
   }
 
   async getUserReviews(userId, { limit, page, orderBy = "createdAt_desc" }) {
@@ -147,19 +139,19 @@ class JsonServerApi extends RESTDataSource {
       ...(page && { page }),
       orderBy,
       userId,
-    })
-    const reviews = await this.get(`/reviews${queryString}`)
-    const pageInfo = this.parsePageInfo({ limit, page })
-    return { results: reviews, pageInfo }
+    });
+    const reviews = await this.get(`/reviews${queryString}`);
+    const pageInfo = this.parsePageInfo({ limit, page });
+    return { results: reviews, pageInfo };
   }
 
   async getUser(username) {
-    const [user] = await this.get(`/users?username=${username}`)
-    return user
+    const [user] = await this.get(`/users?username=${username}`);
+    return user;
   }
 
   createAuthor(name) {
-    return this.post("/authors", { name })
+    return this.post("/authors", { name });
   }
 
   async createBook({ authorIds, cover, genre, summary, title }) {
@@ -168,17 +160,15 @@ class JsonServerApi extends RESTDataSource {
       ...(genre && { genre }),
       ...(summary && { summary }),
       title,
-    })
+    });
 
-    return book
+    return book;
   }
 
   async createReview({ bookId, rating, reviewerId, text }) {
-    const existingReview = await this.get(
-      `/reviews?bookId=${bookId}&userId=${reviewerId}`
-    )
+    const existingReview = await this.get(`/reviews?bookId=${bookId}&userId=${reviewerId}`);
     if (existingReview.length) {
-      throw new ForbiddenError("Users can only submit one review perbook")
+      throw new ForbiddenError("Users can only submit one review perbook");
     }
     return this.post("/reviews", {
       ...(text && { text }),
@@ -186,53 +176,50 @@ class JsonServerApi extends RESTDataSource {
       createdAt: new Date().toISOString(),
       rating,
       userId: parseInt(reviewerId),
-    })
+    });
   }
 
   updateReview({ id, rating, text }) {
     return this.patch(`reviews/${id}`, {
       rating,
       ...(text && { text }),
-    })
+    });
   }
   async deleteReview(id) {
-    await this.delete(`/reviews/${id}`)
-    return id
+    await this.delete(`/reviews/${id}`);
+    return id;
   }
 
   async checkUniqueUserData(email, username) {
     const res = await Promise.all([
       this.get(`/users?email=${email}`),
       this.get(`/users?username=${username}`),
-    ])
-    const [existingEmail, existingUsername] = res
+    ]);
+    const [existingEmail, existingUsername] = res;
     if (existingEmail.length) {
-      throw new UserInputError("Email is already in use")
+      throw new UserInputError("Email is already in use");
     } else if (existingUsername.length) {
-      throw new UserInputError("Username already in use")
+      throw new UserInputError("Username already in use");
     }
   }
 
-  async signUp({ email, name, username }) {
-    await this.checkUniqueUserData(email, username)
+  signUp({ email, name, username }) {
     return this.post("/users", {
+      createdAt: new Date().toISOString(),
       email,
       name,
       username,
-    })
+    });
   }
 
   async addBooksToLibrary({ bookIds, userId }) {
     const response = await Promise.all(
-      bookIds.map((bookId) =>
-        this.get(`/userBooks/?userId=${userId}&bookId=${bookId}`)
-      )
-    )
-    const existingUserBooks = response.flat()
+      bookIds.map((bookId) => this.get(`/userBooks/?userId=${userId}&bookId=${bookId}`))
+    );
+    const existingUserBooks = response.flat();
     const newBookIds = bookIds.filter(
-      (bookId) =>
-        !existingUserBooks.find((book) => book.id === parseInt(bookId))
-    )
+      (bookId) => !existingUserBooks.find((book) => book.id === parseInt(bookId))
+    );
     await Promise.all(
       bookIds.map((bookId) =>
         this.post("/userBooks", {
@@ -241,60 +228,54 @@ class JsonServerApi extends RESTDataSource {
           userId: parseInt(userId),
         })
       )
-    )
-    return this.get(`/users/${userId}`)
+    );
+    return this.get(`/users/${userId}`);
   }
 
   async removeBooksFromLibrary({ bookIds, userId }) {
     const response = await Promise.all(
-      bookIds.map((bookId) =>
-        this.get(`/userBooks/?userId=${userId}&bookId=${bookId}`)
-      )
-    )
-    const existingUserBooks = response.flat()
-    await Promise.all(
-      existingUserBooks.map(({ id }) => this.delete(`/userBooks/${id}`))
-    )
-    return this.get(`/users/${userId}`)
+      bookIds.map((bookId) => this.get(`/userBooks/?userId=${userId}&bookId=${bookId}`))
+    );
+    const existingUserBooks = response.flat();
+    await Promise.all(existingUserBooks.map(({ id }) => this.delete(`/userBooks/${id}`)));
+    return this.get(`/users/${userId}`);
   }
 
   async searchPeople({ exact, query, orderBy = "RESULT_ASC" }) {
     const queryString = this.parseParams({
       ...(exact ? { name: query } : { q: query }),
       limit: 50,
-    })
-    const authors = await this.get(`/authors${queryString}`)
-    const users = await this.get(`/users${queryString}`)
+    });
+    const authors = await this.get(`/authors${queryString}`);
+    const users = await this.get(`/users${queryString}`);
     const results = []
       .concat(authors, users)
       .sort((a, b) =>
-        orderBy === "RESULT_ASC"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name)
-      )
-    return results
+        orderBy === "RESULT_ASC" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+      );
+    return results;
   }
 
   async searchBooks({ exact, query, orderBy = "RESULT_ASC" }) {
     const bookQueryString = this.parseParams({
       ...(exact ? { title: query } : { q: query }),
       limit: 50,
-    })
+    });
     const authorQueryString = this.parseParams({
       ...(exact ? { name: query } : { q: query }),
       limit: 50,
-    })
-    const authors = await this.get(`/authors${authorQueryString}`)
-    const books = await this.get(`/books${bookQueryString}`)
+    });
+    const authors = await this.get(`/authors${authorQueryString}`);
+    const books = await this.get(`/books${bookQueryString}`);
     const results = [].concat(authors, books).sort((a, b) => {
-      const aKey = a.hasOwnProperty("title") ? "title" : "name"
-      const bKey = b.hasOwnProperty("title") ? "title" : "name"
+      const aKey = a.hasOwnProperty("title") ? "title" : "name";
+      const bKey = b.hasOwnProperty("title") ? "title" : "name";
       return orderBy === "RESULT_ASC"
         ? a[aKey].localeCompare(b[bKey])
-        : b[bKey].localeCompare(a[aKey])
-    })
-    return results
+        : b[bKey].localeCompare(a[aKey]);
+    });
+    return results;
   }
 }
 
-export default JsonServerApi
+export default JsonServerApi;
