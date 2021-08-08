@@ -102,6 +102,12 @@ const resolvers = {
       return dataSources.jsonServerApi.getUser(username);
     },
 
+    viewer(root, args, { dataSources, user }, info) {
+      if (user?.username) {
+        return dataSources.jsonServerApi.getUser(user.username);
+      }
+      return null;
+    },
     searchPeople(root, args, { dataSources }, info) {
       return dataSources.jsonServerApi.searchPeople(args);
     },
@@ -136,13 +142,6 @@ const resolvers = {
 
     login(root, args, { dataSources }, info) {
       return dataSources.jsonServerApi.login(args);
-    },
-
-    viewer(root, args, { dataSources, user }, info) {
-      if (user?.username) {
-        return dataSources.jsonServerApi.getUser(user.username);
-      }
-      return null;
     },
 
     addBooksToLibrary(root, { input }, { dataSources }, info) {

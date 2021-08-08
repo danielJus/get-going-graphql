@@ -140,7 +140,8 @@ const typeDefs = gql`
     books(limit: Int = 20, orderBy: BookOrderBy, page: Int): Books
     review(id: ID!): Review
     searchPeople(exact: Boolean = false, orderBy: SearchOrderBy, query: String!): [Person]
-
+    "Retrieves the currently authenticated user."
+    viewer: User
     searchBooks(exact: Boolean = false, orderBy: SearchOrderBy, query: String!): [BookResult]
     user(username: String!): User!
   }
@@ -154,8 +155,6 @@ const typeDefs = gql`
     signUp(input: SignUpInput!): AuthPayload!
     "Authenticates an existing user."
     login(password: String!, username: String!): AuthPayload!
-    "Retrieves the currently authenticated user."
-    viewer: User
     addBooksToLibrary(input: UpdateLibraryBooksInput!): User!
     removeBooksFromLibrary(input: UpdateLibraryBooksInput!): User!
   }
