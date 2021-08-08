@@ -1,4 +1,4 @@
-import { ForbiddenError, UserInputError } from "apollo-server";
+import { AuthenticationError, ForbiddenError, UserInputError } from "apollo-server-express";
 import { RESTDataSource } from "apollo-datasource-rest";
 import parseLinkHeader from "parse-link-header";
 import validator from "validator";
@@ -221,6 +221,23 @@ class JsonServerApi extends RESTDataSource {
       password: passwordHash,
       username,
     });
+    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+      algorithm: "HS256",
+      subject: user.id.toString(),
+      expiresIn: "1d",
+    });
+    return { token, viewer: user };
+  }
+
+  async login({ password, username }) {
+    const user = await this.getUser(username);
+    if (!user) {
+      throw new AuthenticationError("User with that username does not exist");
+    }
+    const isValidPassword = await verifyPassword(password, user.password);
+    if (!isValidPassword) {
+      throw new AuthenticationError("Username or password is incorrect");
+    }
     const token = jwt.sign({ username }, process.env.JWT_SECRET, {
       algorithm: "HS256",
       subject: user.id.toString(),

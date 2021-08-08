@@ -1,4 +1,5 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-express";
+
 const typeDefs = gql`
   directive @unique(
     "The resource path name from the REST endpoint."
@@ -151,6 +152,10 @@ const typeDefs = gql`
     deleteReview(id: ID!): ID!
     updateReview(input: UpdateReviewInput!): Review!
     signUp(input: SignUpInput!): AuthPayload!
+    "Authenticates an existing user."
+    login(password: String!, username: String!): AuthPayload!
+    "Retrieves the currently authenticated user."
+    viewer: User
     addBooksToLibrary(input: UpdateLibraryBooksInput!): User!
     removeBooksFromLibrary(input: UpdateLibraryBooksInput!): User!
   }

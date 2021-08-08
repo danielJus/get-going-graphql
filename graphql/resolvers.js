@@ -1,5 +1,5 @@
-import DateTimeType from "./scalars/DateTimeType.js"
-import RatingType from "./scalars/RatingType.js"
+import DateTimeType from "./scalars/DateTimeType.js";
+import RatingType from "./scalars/RatingType.js";
 
 const resolvers = {
   DateTime: DateTimeType,
@@ -25,47 +25,47 @@ const resolvers = {
 
   Author: {
     books(author, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getAuthorBooks(author.id)
+      return dataSources.jsonServerApi.getAuthorBooks(author.id);
     },
   },
   Book: {
     authors(book, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getBookAuthors(book.id)
+      return dataSources.jsonServerApi.getBookAuthors(book.id);
     },
     reviews(book, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getBookReviews(book.id, args)
+      return dataSources.jsonServerApi.getBookReviews(book.id, args);
     },
   },
 
   Review: {
     book(review, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getBookById(review.bookId)
+      return dataSources.jsonServerApi.getBookById(review.bookId);
     },
 
     reviewedOn(review, args, { dataSources }, info) {
-      return review.createdAt
+      return review.createdAt;
     },
 
     reviewer(review, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getUserById(review.userId)
+      return dataSources.jsonServerApi.getUserById(review.userId);
     },
   },
 
   User: {
     library(user, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getUserLibrary(user.id, args)
+      return dataSources.jsonServerApi.getUserLibrary(user.id, args);
     },
     reviews(user, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getUserReviews(user.id, args)
+      return dataSources.jsonServerApi.getUserReviews(user.id, args);
     },
   },
 
   Person: {
     __resolveType(obj, context, info) {
       if (obj.username) {
-        return "User"
+        return "User";
       } else {
-        return "Author"
+        return "Author";
       }
     },
   },
@@ -73,74 +73,85 @@ const resolvers = {
   BookResult: {
     __resolveType(obj, context, info) {
       if (obj.title) {
-        return "Book"
+        return "Book";
       } else {
-        return "Author"
+        return "Author";
       }
     },
   },
 
   Query: {
     author(root, { id }, { dataSources }, info) {
-      return dataSources.jsonServerApi.getAuthorById(id)
+      return dataSources.jsonServerApi.getAuthorById(id);
     },
     authors(root, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getAuthors(args)
+      return dataSources.jsonServerApi.getAuthors(args);
     },
     book(root, { id }, { dataSources }, info) {
-      return dataSources.jsonServerApi.getBookById(id)
+      return dataSources.jsonServerApi.getBookById(id);
     },
     books(root, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.getBooks(args)
+      return dataSources.jsonServerApi.getBooks(args);
     },
 
     review(root, { id }, { dataSources }, info) {
-      return dataSources.jsonServerApi.getReviewById(id)
+      return dataSources.jsonServerApi.getReviewById(id);
     },
 
     user(root, { username }, { dataSources }, info) {
-      return dataSources.jsonServerApi.getUser(username)
+      return dataSources.jsonServerApi.getUser(username);
     },
 
     searchPeople(root, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.searchPeople(args)
+      return dataSources.jsonServerApi.searchPeople(args);
     },
 
     searchBooks(root, args, { dataSources }, info) {
-      return dataSources.jsonServerApi.searchBooks(args)
+      return dataSources.jsonServerApi.searchBooks(args);
     },
   },
 
   Mutation: {
     createAuthor(root, { name }, { dataSources }, info) {
-      return dataSources.jsonServerApi.createAuthor(name)
+      return dataSources.jsonServerApi.createAuthor(name);
     },
     createBook(root, { input }, { dataSources }, info) {
-      return dataSources.jsonServerApi.createBook(input)
+      return dataSources.jsonServerApi.createBook(input);
     },
 
     createReview(root, { input }, { dataSources }, info) {
-      return dataSources.jsonServerApi.createReview(input)
+      return dataSources.jsonServerApi.createReview(input);
     },
 
     deleteReview(root, { id }, { dataSources }, info) {
-      return dataSources.jsonServerApi.deleteReview(id)
+      return dataSources.jsonServerApi.deleteReview(id);
     },
     updateReview(root, { input }, { dataSources }, info) {
-      return dataSources.jsonServerApi.updateReview(input)
+      return dataSources.jsonServerApi.updateReview(input);
     },
 
     signUp(root, { input }, { dataSources }, info) {
-      return dataSources.jsonServerApi.signUp(input)
+      return dataSources.jsonServerApi.signUp(input);
+    },
+
+    login(root, args, { dataSources }, info) {
+      return dataSources.jsonServerApi.login(args);
+    },
+
+    viewer(root, args, { dataSources, user }, info) {
+      if (user?.username) {
+        return dataSources.jsonServerApi.getUser(user.username);
+      }
+      return null;
     },
 
     addBooksToLibrary(root, { input }, { dataSources }, info) {
-      return dataSources.jsonServerApi.addBooksToLibrary(input)
+      return dataSources.jsonServerApi.addBooksToLibrary(input);
     },
     // ...
     removeBooksFromLibrary(root, { input }, { dataSources }, info) {
-      return dataSources.jsonServerApi.removeBooksFromLibrary(input)
+      return dataSources.jsonServerApi.removeBooksFromLibrary(input);
     },
   },
-}
-export default resolvers
+};
+export default resolvers;

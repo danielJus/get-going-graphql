@@ -1,6 +1,6 @@
-import { ApolloError } from "apollo-server"
-import { GraphQLScalarType } from "graphql"
-import validator from "validator"
+import { ApolloError } from "apollo-server-express";
+import { GraphQLScalarType } from "graphql";
+import validator from "validator";
 
 const DateTimeType = new GraphQLScalarType({
   name: "DateTime",
@@ -8,24 +8,24 @@ const DateTimeType = new GraphQLScalarType({
   // date string validation logic will go here...
   parseValue: (value) => {
     if (validator.isISO8601(value)) {
-      return value
+      return value;
     }
-    throw new ApolloError("DateTime must be a valid ISO 8601 date string")
+    throw new ApolloError("DateTime must be a valid ISO 8601 date string");
   },
 
   serialize: (value) => {
     if (validator.isISO8601(value)) {
-      return value
+      return value;
     }
-    throw new ApolloError("DateTime must be a valid ISO 8601 date string")
+    throw new ApolloError("DateTime must be a valid ISO 8601 date string");
   },
 
   parseLiteral: (ast) => {
     if (validator.isISO8601(ast.value)) {
-      return ast.value
+      return ast.value;
     }
-    throw new ApolloError("DateTime must be a valid ISO 8601 date string")
+    throw new ApolloError("DateTime must be a valid ISO 8601 date string");
   },
-})
+});
 
-export default DateTimeType
+export default DateTimeType;
