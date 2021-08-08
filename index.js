@@ -1,4 +1,5 @@
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer, makeExecutableSchema } from "apollo-server-express";
+import { applyMiddleware } from "graphql-middleware";
 import cors from "cors";
 import express from "express";
 import expressJwt from "express-jwt";
@@ -6,6 +7,7 @@ import JsonServerApi from "./graphql/dataSources/JsonServerApi.js";
 import resolvers from "./graphql/resolvers.js";
 import typeDefs from "./graphql/typeDefs.js";
 import UniqueDirective from "./graphql/directives/UniqueDirective.js";
+import permissions from "./graphql/permissions.js";
 
 const port = process.env.GRAPHQL_API_PORT;
 const app = express();
@@ -33,16 +35,21 @@ app.use(
   }
 );
 
-const server = new ApolloServer({
+const schema = makeExecutableSchema({
   typeDefs,
   resolvers,
+  schemaDirectives: {
+    unique: UniqueDirective,
+  },
+});
+const schemaWithPermissions = applyMiddleware(schema, permissions);
+
+const server = new ApolloServer({
+  schema: schemaWithPermissions,
   dataSources: () => {
     return {
       jsonServerApi: new JsonServerApi(),
     };
-  },
-  schemaDirectives: {
-    unique: UniqueDirective,
   },
   context: ({ req }) => {
     const user = req.user || null;
