@@ -15,8 +15,6 @@ class UniqueDirective extends SchemaDirectiveVisitor {
   }
 
   getMutationArgumentValue(fieldName, args) {
-    console.log("fieldName", fieldName);
-    console.log("args", args);
     const argTuples = Object.entries(args);
 
     for (let i = 0; i < argTuples.length; i++) {

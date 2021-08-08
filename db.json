@@ -76,6 +76,13 @@
       "name": "Jo March",
       "username": "bookworm68",
       "id": 2
+    },
+    {
+      "email": "scout@email.com",
+      "name": "Scout Finch",
+      "password": "a5312c341424a8b6482bd67ef99b55e8:2695f4d392c99a9e0cb23fb7d77c071fecd2074b56852c1967c5f3dd6b68905affb805cf3c3247aa592ca3abf4828ed1321ccfba7fc1d5e3441115047412ba75",
+      "username": "mockingbird60",
+      "id": 3
     }
   ],
   "userBooks": [

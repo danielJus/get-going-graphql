@@ -125,6 +125,13 @@ const typeDefs = gql`
     pageInfo: PageInfo
   }
 
+  type AuthPayload {
+    "The logged-in user."
+    viewer: User
+    "A JWT issued at the time of the user's most recent authentication."
+    token: String
+  }
+
   type Query {
     author(id: ID!): Author
     authors(limit: Int = 20, orderBy: AuthorOrderBy, page: Int): Authors
@@ -143,7 +150,7 @@ const typeDefs = gql`
     createReview(input: CreateReviewInput!): Review!
     deleteReview(id: ID!): ID!
     updateReview(input: UpdateReviewInput!): Review!
-    signUp(input: SignUpInput!): User!
+    signUp(input: SignUpInput!): AuthPayload!
     addBooksToLibrary(input: UpdateLibraryBooksInput!): User!
     removeBooksFromLibrary(input: UpdateLibraryBooksInput!): User!
   }
@@ -171,6 +178,13 @@ const typeDefs = gql`
   input SignUpInput {
     email: String! @unique(path: "users")
     name: String!
+    """
+    The user's chosen password.
+    It must be a minimum of 8 characters in length and contain 1 lowercase
+    letter, 1 uppercase letter, 1 number, and 1 special character.
+    """
+    password: String!
+    "The user's chosen username (must be unique)."
     username: String! @unique(path: "users")
   }
 
